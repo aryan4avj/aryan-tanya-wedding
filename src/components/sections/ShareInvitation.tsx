@@ -2,7 +2,8 @@
 
 import { useToast } from "@/components/ui/Toast";
 import { siteConfig } from "@/config/site";
-import { Share2, MessageCircle, Link2 } from "lucide-react";
+import { Share2, MessageCircle, Link2, X } from "lucide-react";
+import { C, F, styles } from "@/lib/styles";
 
 interface ShareInvitationProps {
   variant?: "modal" | "inline";
@@ -11,120 +12,112 @@ interface ShareInvitationProps {
 
 export default function ShareInvitation({ variant = "inline", onClose }: ShareInvitationProps) {
   const { showToast } = useToast();
-  const url  = siteConfig.social.url;
+  const url  = typeof window !== "undefined" ? window.location.origin : siteConfig.social.url;
   const text = siteConfig.social.whatsappText + url;
 
   const handleNativeShare = async () => {
-    if (typeof navigator.share === "function") {
+    // Use Web Share API on mobile — shows the native share sheet
+    if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
       try {
         await navigator.share({
           title: siteConfig.social.title,
           text:  siteConfig.social.description,
           url,
         });
+        onClose?.();
+        return;
       } catch {
-        // User cancelled - ignore
+        // User cancelled or not supported — fall through to WhatsApp
       }
-    } else {
-      copyLink();
     }
+    // Fallback: open WhatsApp share
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
     onClose?.();
   };
 
   const copyLink = async () => {
     try {
       await navigator.clipboard.writeText(url);
-      showToast("Invitation link copied!");
+      showToast("Link copied!");
     } catch {
-      showToast("Could not copy - please copy from the address bar");
+      // Fallback for older browsers
+      const ta = document.createElement("textarea");
+      ta.value = url;
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      showToast("Link copied!");
     }
     onClose?.();
   };
 
   const whatsAppUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
 
-  if (variant === "inline") {
-    return (
-      <div className="flex flex-wrap gap-2 justify-center">
-        <button
-          onClick={handleNativeShare}
-          className="btn-outline btn-sm flex items-center gap-1.5"
-          aria-label="Share invitation"
-        >
-          <Share2 size={14} />
-          Share
-        </button>
-        <a
-          href={whatsAppUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn-outline btn-sm flex items-center gap-1.5"
-          aria-label="Share on WhatsApp"
-        >
-          <MessageCircle size={14} />
-          WhatsApp
-        </a>
-        <button
-          onClick={copyLink}
-          className="btn-outline btn-sm flex items-center gap-1.5"
-          aria-label="Copy invitation link"
-        >
-          <Link2 size={14} />
-          Copy Link
-        </button>
-      </div>
-    );
-  }
-
-  // Modal variant - rendered inside a bottom sheet
+  // Modal variant
   return (
     <div
-      className="fixed inset-0 z-[7000] flex items-end sm:items-center justify-center"
+      onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label="Share invitation"
+      style={{
+        position: "fixed", inset: 0, zIndex: 7000,
+        display: "flex", alignItems: "flex-end", justifyContent: "center",
+        background: "rgba(30,24,20,0.6)",
+      }}
     >
       <div
-        className="absolute inset-0"
-        style={{ background: "rgba(30,24,20,0.6)" }}
-        onClick={onClose}
-      />
-      <div
-        className="relative w-full sm:w-auto sm:min-w-[320px] rounded-t-2xl sm:rounded-2xl p-6"
-        style={{ background: "var(--ivory)", maxWidth: 400, zIndex: 1 }}
+        onClick={e => e.stopPropagation()}
+        style={{
+          width: "100%", maxWidth: 400,
+          background: C.ivory,
+          borderRadius: "20px 20px 0 0",
+          padding: "20px 20px calc(env(safe-area-inset-bottom, 0px) + 20px)",
+        }}
       >
-        <h3
-          style={{ fontFamily: "var(--font-display)", fontSize: "1.35rem", fontWeight: 400, color: "var(--charcoal)", marginBottom: "1rem" }}
-        >
-          Share the Invitation
-        </h3>
-        <div className="flex flex-col gap-2">
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+          <h3 style={{ fontFamily: F.display, fontSize: 20, fontWeight: 400, color: C.charcoal, margin: 0 }}>
+            Share Invitation
+          </h3>
+          <button onClick={onClose} aria-label="Close" style={{
+            width: 32, height: 32, borderRadius: "50%", background: "rgba(182,150,89,0.1)",
+            border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <X size={14} color={C.charcoal} />
+          </button>
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {/* Native share — works on iOS Safari, Android Chrome */}
           <button
             onClick={handleNativeShare}
-            className="btn-primary flex items-center gap-2"
+            style={{ ...styles.btnPrimary, width: "100%", gap: 8 }}
           >
-            <Share2 size={15} />
-            Share Invitation
+            <Share2 size={16} /> Share
           </button>
+
+          {/* WhatsApp direct */}
           <a
             href={whatsAppUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-outline flex items-center gap-2"
+            style={{ ...styles.btnOutline, width: "100%", gap: 8, textDecoration: "none" }}
           >
-            <MessageCircle size={15} />
-            Share on WhatsApp
+            <MessageCircle size={16} /> WhatsApp
           </a>
+
+          {/* Copy link */}
           <button
             onClick={copyLink}
-            className="btn-outline flex items-center gap-2"
+            style={{ ...styles.btnOutline, width: "100%", gap: 8 }}
           >
-            <Link2 size={15} />
-            Copy Invitation Link
+            <Link2 size={16} /> Copy Link
           </button>
         </div>
       </div>
     </div>
   );
 }
-

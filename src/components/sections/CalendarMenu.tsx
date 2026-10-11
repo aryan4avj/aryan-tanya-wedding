@@ -1,8 +1,9 @@
 ﻿"use client";
 
 import { useEffect, useRef } from "react";
-import { X, Calendar, ExternalLink } from "lucide-react";
+import { X, Calendar } from "lucide-react";
 import { buildGoogleCalendarUrl, downloadICS } from "@/lib/calendar";
+import { C, F, styles } from "@/lib/styles";
 import type { WeddingEvent } from "@/data/events";
 
 interface CalendarMenuProps {
@@ -13,99 +14,77 @@ interface CalendarMenuProps {
 export default function CalendarMenu({ event, onClose }: CalendarMenuProps) {
   const ref = useRef<HTMLDivElement>(null);
 
-  // Trap focus
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const focusable = el.querySelectorAll<HTMLElement>(
-      "button, a, [tabindex]:not([tabindex='-1'])"
-    );
-    focusable[0]?.focus();
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-      if (e.key === "Tab") {
-        const first = focusable[0];
-        const last  = focusable[focusable.length - 1];
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault(); last?.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault(); first?.focus();
-        }
-      }
-    };
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
   }, [onClose]);
 
   const mapUrl = event.mapLinks[0]?.url;
-  const googleUrl = buildGoogleCalendarUrl(event, mapUrl && !mapUrl.startsWith("PLACEHOLDER") ? mapUrl : undefined);
+  const hasMap = mapUrl && !mapUrl.startsWith("PLACEHOLDER");
+  const googleUrl = buildGoogleCalendarUrl(event, hasMap ? mapUrl : undefined);
+
+  const handleGoogle = () => {
+    // Opens Google Calendar add event page — works on both iOS and Android
+    window.open(googleUrl, "_blank");
+    onClose();
+  };
+
+  const handleICS = () => {
+    downloadICS(event, hasMap ? mapUrl : undefined);
+    onClose();
+  };
 
   return (
     <div
-      className="fixed inset-0 z-[7000] flex items-end sm:items-center justify-center"
+      onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label={`Add ${event.name} to calendar`}
+      style={{
+        position: "fixed", inset: 0, zIndex: 7000,
+        display: "flex", alignItems: "flex-end", justifyContent: "center",
+        background: "rgba(30,24,20,0.6)",
+      }}
     >
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0"
-        style={{ background: "rgba(30,24,20,0.6)" }}
-        onClick={onClose}
-      />
-
-      {/* Sheet */}
       <div
         ref={ref}
-        className="relative w-full sm:w-auto sm:min-w-[320px] rounded-t-2xl sm:rounded-2xl p-6"
-        style={{ background: "var(--ivory)", maxWidth: 400, zIndex: 1 }}
+        onClick={e => e.stopPropagation()}
+        style={{
+          width: "100%", maxWidth: 400,
+          background: C.ivory,
+          borderRadius: "20px 20px 0 0",
+          padding: "20px 20px calc(env(safe-area-inset-bottom, 0px) + 20px)",
+        }}
       >
-        <div className="flex items-center justify-between mb-4">
-          <h3
-            className="font-display text-lg"
-            style={{ fontFamily: "var(--font-display)", color: "var(--charcoal)" }}
-          >
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+          <h3 style={{ fontFamily: F.display, fontSize: 18, fontWeight: 400, color: C.charcoal, margin: 0 }}>
             Add to Calendar
           </h3>
-          <button
-            onClick={onClose}
-            className="flex items-center justify-center w-8 h-8 rounded-full"
-            style={{ background: "rgba(182,150,89,0.1)" }}
-            aria-label="Close calendar menu"
-          >
-            <X size={15} />
+          <button onClick={onClose} aria-label="Close" style={{
+            width: 32, height: 32, borderRadius: "50%", background: "rgba(182,150,89,0.1)",
+            border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <X size={14} color={C.charcoal} />
           </button>
         </div>
 
-        <p className="font-body text-sm mb-4" style={{ color: "var(--secondary)" }}>
+        <p style={{ fontFamily: F.body, fontSize: 13, color: C.secondary, marginBottom: 14 }}>
           {event.name} - {event.dateDisplay}
         </p>
 
-        <div className="flex flex-col gap-2">
-          <a
-            href={googleUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-outline flex items-center gap-2"
-            style={{ justifyContent: "flex-start", textTransform: "none", letterSpacing: "0.03em" }}
-          >
-            <Calendar size={16} style={{ color: "var(--gold)" }} />
-            Google Calendar
-            <ExternalLink size={13} className="ml-auto" style={{ opacity: 0.4 }} />
-          </a>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {/* Google Calendar — opens directly */}
+          <button onClick={handleGoogle} style={{ ...styles.btnPrimary, width: "100%", gap: 8 }}>
+            <Calendar size={16} /> Google Calendar
+          </button>
 
-          <button
-            onClick={() => { downloadICS(event, mapUrl && !mapUrl.startsWith("PLACEHOLDER") ? mapUrl : undefined); onClose(); }}
-            className="btn-outline flex items-center gap-2"
-            style={{ justifyContent: "flex-start", textTransform: "none", letterSpacing: "0.03em" }}
-          >
-            <Calendar size={16} style={{ color: "var(--sage)" }} />
-            Apple / Outlook (.ics)
+          {/* ICS download — for Apple/Outlook */}
+          <button onClick={handleICS} style={{ ...styles.btnOutline, width: "100%", gap: 8 }}>
+            <Calendar size={16} /> Apple / Outlook (.ics)
           </button>
         </div>
       </div>
     </div>
   );
 }
-

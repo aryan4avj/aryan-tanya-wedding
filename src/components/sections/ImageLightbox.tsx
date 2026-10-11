@@ -19,8 +19,8 @@ export default function ImageLightbox({ images, initialIndex, year, onClose }: I
   const [imgError, setImgError] = useState(false);
   const closeRef = useRef<HTMLButtonElement>(null);
   const current = images[index];
-  const goNext = () => setIndex(i => Math.min(i + 1, images.length - 1));
-  const goPrev = () => setIndex(i => Math.max(i - 1, 0));
+  const goNext = () => setIndex(i => (i + 1) % images.length);
+  const goPrev = () => setIndex(i => (i - 1 + images.length) % images.length);
   const swipe = useSwipe({ onSwipeLeft: goNext, onSwipeRight: goPrev });
 
   useEffect(() => { setImgError(false); }, [index]);
@@ -110,10 +110,10 @@ export default function ImageLightbox({ images, initialIndex, year, onClose }: I
 
         {/* ── Image frame ── strictly bounded */}
         <div style={{ position: "relative", width: "100%" }}>
-          {/* Prev arrow */}
-          {index > 0 && (
+          {/* Prev arrow — always visible since it loops */}
+          {images.length > 1 && (
             <button
-              onClick={() => setIndex(i => i - 1)}
+              onClick={goPrev}
               aria-label="Previous photo"
               style={{ ...ctrlBtn, left: -12, top: "50%", transform: "translateY(-50%)" }}
             >
@@ -121,10 +121,10 @@ export default function ImageLightbox({ images, initialIndex, year, onClose }: I
             </button>
           )}
 
-          {/* Next arrow */}
-          {index < images.length - 1 && (
+          {/* Next arrow — always visible since it loops */}
+          {images.length > 1 && (
             <button
-              onClick={() => setIndex(i => i + 1)}
+              onClick={goNext}
               aria-label="Next photo"
               style={{ ...ctrlBtn, right: -12, top: "50%", transform: "translateY(-50%)" }}
             >
