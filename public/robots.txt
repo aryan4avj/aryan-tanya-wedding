@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /
+
+# Private wedding invitation — search indexing disabled

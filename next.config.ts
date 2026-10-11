@@ -1,17 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  cacheComponents: true,
-  partialPrefetching: true,
-  turbopack: {
-    rules: {
-      "*.css": {
-        loaders: ["@tailwindcss/turbopack"],
-        as: "*.css",
-      },
-    },
+  images: {
+    formats: ["image/avif", "image/webp"],
+    // Add external domains here if serving images from a CDN
+    remotePatterns: [],
   },
+  // Allow static exports for Vercel / Netlify
+  output: undefined,
 };
 
 export default nextConfig;

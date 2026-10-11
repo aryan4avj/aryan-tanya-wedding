@@ -1,26 +1,97 @@
 @import "tailwindcss";
 
+/* ─── Design tokens ──────────────────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ivory:      #FFF9F1;
+  --champagne:  #F4EBDD;
+  --blush:      #F3DED9;
+  --dusty-rose: #D59A91;
+  --sage:       #A8B69D;
+  --terracotta: #C77C67;
+  --marigold:   #E5AA46;
+  --gold:       #B69659;
+  --charcoal:   #423A36;
+  --secondary:  #756A64;
+  --muted:      #9E938D;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* ─── Base ───────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--ivory);
+  color: var(--charcoal);
+  font-family: "Manrope", system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+::selection { background: rgba(229,170,70,0.25); color: var(--charcoal); }
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--champagne); }
+::-webkit-scrollbar-thumb { background: rgba(182,150,89,0.4); border-radius: 3px; }
+
+/* ─── Petal keyframes ────────────────────────────────────────────────────── */
+@keyframes petalFall {
+  0%   { transform: translateY(-20px) rotate(0deg)   scale(1);   opacity: 0; }
+  8%   { opacity: 0.75; }
+  92%  { opacity: 0.5; }
+  100% { transform: translateY(105vh) rotate(600deg) scale(0.6); opacity: 0; }
+}
+@keyframes petalSway {
+  0%   { margin-left: 0px; }
+  33%  { margin-left: 28px; }
+  66%  { margin-left: -18px; }
+  100% { margin-left: 6px; }
+}
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+/* ─── Scroll reveal ──────────────────────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ─── Reduced motion ─────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal { opacity: 1; transform: none; transition: none; }
 }
