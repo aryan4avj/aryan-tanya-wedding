@@ -6,11 +6,22 @@ import { C, F } from "@/lib/styles";
 
 export default function InvitationOpening({ onOpen }: { onOpen: () => void }) {
   const [fading, setFading] = useState(false);
+  const [skipAttempt, setSkipAttempt] = useState(0);
 
   const handleOpen = () => {
     setFading(true);
     setTimeout(onOpen, 700);
   };
+
+  const handleSkip = () => {
+    setSkipAttempt(prev => prev + 1);
+  };
+
+  const skipMessages = [
+    "Nice try! There's no skipping a wedding invitation 😄",
+    "Still no shortcut... just open the invitation! 🙏",
+    "Okay fine, we get it. But the button is right above ↑",
+  ];
 
   return (
     <div
@@ -156,14 +167,62 @@ export default function InvitationOpening({ onOpen }: { onOpen: () => void }) {
           Open Invitation
         </button>
 
-        {/* Skip */}
-        <button
-          onClick={onOpen}
-          style={{ background: "none", border: "none", cursor: "pointer", fontFamily: F.body, fontSize: "0.72rem", color: C.muted, letterSpacing: "0.08em", marginTop: 18, padding: "8px 16px" }}
-          aria-label="Enter the invitation directly"
-        >
-          Skip
-        </button>
+        {/* Skip - shows funny message instead of skipping */}
+        {skipAttempt === 0 ? (
+          <button
+            onClick={handleSkip}
+            style={{ background: "none", border: "none", cursor: "pointer", fontFamily: F.body, fontSize: "0.72rem", color: C.muted, letterSpacing: "0.08em", marginTop: 18, padding: "8px 16px" }}
+          >
+            Skip
+          </button>
+        ) : (
+          <div style={{ marginTop: 14, textAlign: "center" }}>
+            <p style={{
+              fontFamily: F.body,
+              fontSize: 13,
+              color: C.dustyRose,
+              marginBottom: 10,
+              lineHeight: 1.5,
+              padding: "8px 16px",
+              background: "rgba(213,154,145,0.08)",
+              borderRadius: 12,
+              border: "1px solid rgba(213,154,145,0.15)",
+            }}>
+              {skipMessages[Math.min(skipAttempt - 1, skipMessages.length - 1)]}
+            </p>
+            {skipAttempt < 3 ? (
+              <button
+                onClick={handleSkip}
+                style={{ background: "none", border: "none", cursor: "pointer", fontFamily: F.body, fontSize: "0.68rem", color: C.muted, letterSpacing: "0.06em", padding: "6px 12px" }}
+              >
+                Skip anyway
+              </button>
+            ) : (
+              <button
+                onClick={handleOpen}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  minHeight: 44,
+                  padding: "0 2rem",
+                  background: C.charcoal,
+                  color: C.ivory,
+                  fontFamily: F.body,
+                  fontSize: "0.75rem",
+                  fontWeight: 600,
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase" as const,
+                  borderRadius: 9999,
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                Open Invitation
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

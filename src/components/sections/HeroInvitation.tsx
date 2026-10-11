@@ -57,6 +57,74 @@ export default function HeroInvitation({ onViewEvents, onRSVP, onShare, onCalend
         paddingBottom: "env(safe-area-inset-bottom, 0px)",
       }}
     >
+      {/* Party popper confetti falling from top */}
+      <style>{`
+        @keyframes heroConfettiFall {
+          0%   { transform: translateY(-15px) rotate(0deg); opacity: 0; }
+          6%   { opacity: 0.85; }
+          90%  { opacity: 0.5; }
+          100% { transform: translateY(105dvh) rotate(var(--hcr)) scale(0.6); opacity: 0; }
+        }
+        @keyframes heroConfettiSway {
+          0%,100% { margin-left: 0; }
+          30%  { margin-left: var(--hcs); }
+          70%  { margin-left: calc(var(--hcs) * -0.5); }
+        }
+      `}</style>
+      <div aria-hidden="true" style={{ position: "absolute", inset: 0, pointerEvents: "none", overflow: "hidden", zIndex: 1 }}>
+        {[
+          { l:3,  sz:8,  c:C.gold,     sh:"r", dur:5.0, dl:0.2, rot:500, sw:20 },
+          { l:8,  sz:6,  c:C.dustyRose, sh:"c", dur:5.8, dl:1.0, rot:360, sw:15 },
+          { l:14, sz:10, c:C.marigold,  sh:"r", dur:4.5, dl:0.5, rot:650, sw:28 },
+          { l:20, sz:5,  c:C.sage,      sh:"c", dur:6.0, dl:1.8, rot:400, sw:12 },
+          { l:26, sz:8,  c:C.gold,      sh:"r", dur:5.2, dl:0.1, rot:550, sw:22 },
+          { l:32, sz:7,  c:C.blush,     sh:"c", dur:5.5, dl:2.2, rot:420, sw:18 },
+          { l:38, sz:9,  c:C.dustyRose, sh:"r", dur:4.8, dl:0.7, rot:600, sw:25 },
+          { l:44, sz:6,  c:C.marigold,  sh:"c", dur:5.6, dl:1.5, rot:380, sw:14 },
+          { l:50, sz:11, c:C.gold,      sh:"r", dur:4.4, dl:0.3, rot:720, sw:30 },
+          { l:56, sz:5,  c:C.sage,      sh:"c", dur:6.2, dl:2.5, rot:340, sw:10 },
+          { l:62, sz:8,  c:C.dustyRose, sh:"r", dur:5.1, dl:0.9, rot:520, sw:20 },
+          { l:68, sz:7,  c:C.marigold,  sh:"c", dur:5.4, dl:1.3, rot:460, sw:16 },
+          { l:74, sz:9,  c:C.gold,      sh:"r", dur:4.6, dl:0.4, rot:580, sw:24 },
+          { l:80, sz:6,  c:C.blush,     sh:"c", dur:5.9, dl:2.0, rot:400, sw:15 },
+          { l:86, sz:10, c:C.dustyRose, sh:"r", dur:4.7, dl:0.6, rot:640, sw:26 },
+          { l:92, sz:5,  c:C.gold,      sh:"c", dur:5.3, dl:1.7, rot:380, sw:12 },
+          { l:97, sz:8,  c:C.marigold,  sh:"r", dur:4.9, dl:0.8, rot:560, sw:22 },
+          // Second wave
+          { l:5,  sz:7,  c:C.sage,      sh:"c", dur:5.7, dl:3.0, rot:440, sw:18 },
+          { l:16, sz:9,  c:C.gold,      sh:"r", dur:4.3, dl:3.5, rot:620, sw:28 },
+          { l:28, sz:6,  c:C.dustyRose, sh:"c", dur:5.4, dl:2.8, rot:360, sw:14 },
+          { l:40, sz:8,  c:C.marigold,  sh:"r", dur:5.0, dl:3.2, rot:500, sw:20 },
+          { l:52, sz:10, c:C.blush,     sh:"c", dur:4.6, dl:3.8, rot:460, sw:24 },
+          { l:64, sz:7,  c:C.gold,      sh:"r", dur:5.2, dl:3.1, rot:540, sw:16 },
+          { l:76, sz:5,  c:C.dustyRose, sh:"c", dur:5.8, dl:2.6, rot:380, sw:12 },
+          { l:88, sz:9,  c:C.marigold,  sh:"r", dur:4.4, dl:3.4, rot:660, sw:26 },
+          // Third wave - smaller pieces
+          { l:10, sz:4,  c:C.gold,      sh:"c", dur:6.5, dl:4.0, rot:300, sw:10 },
+          { l:30, sz:4,  c:C.dustyRose, sh:"c", dur:6.0, dl:4.5, rot:320, sw:8 },
+          { l:48, sz:4,  c:C.marigold,  sh:"c", dur:6.3, dl:4.2, rot:280, sw:11 },
+          { l:66, sz:4,  c:C.sage,      sh:"c", dur:5.8, dl:4.8, rot:340, sw:9 },
+          { l:82, sz:4,  c:C.gold,      sh:"c", dur:6.1, dl:4.3, rot:310, sw:10 },
+        ].map((p, i) => (
+          <span
+            key={i}
+            style={{
+              position: "absolute",
+              left: `${p.l}%`,
+              top: -12,
+              width: p.sh === "r" ? p.sz : p.sz * 0.8,
+              height: p.sh === "r" ? p.sz * 0.4 : p.sz * 0.8,
+              background: p.c,
+              borderRadius: p.sh === "c" ? "50%" : 2,
+              opacity: 0,
+              ["--hcr" as string]: `${p.rot}deg`,
+              ["--hcs" as string]: `${p.sw}px`,
+              animation: `heroConfettiFall ${p.dur}s ease-in ${p.dl}s infinite, heroConfettiSway ${p.dur * 0.6}s ease-in-out ${p.dl}s infinite`,
+            } as React.CSSProperties}
+          />
+        ))}
+      </div>
+
       {/* Decorative corner top-right */}
       <svg aria-hidden="true" viewBox="0 0 120 120" fill="none"
         style={{ position:"absolute", top:0, right:0, width:100, height:100, opacity:0.12, pointerEvents:"none" }}>
@@ -85,6 +153,16 @@ export default function HeroInvitation({ onViewEvents, onRSVP, onShare, onCalend
         padding: "0 clamp(1rem, 5vw, 2rem)",
         gap: 0,
       }}>
+
+        {/* Subtle down arrow above Hindi text */}
+        <div aria-hidden="true" style={{
+          marginBottom: "clamp(4px, 1vh, 8px)",
+          animation: a("hFadeIn", 0, 0.4),
+        }}>
+          <svg viewBox="0 0 20 12" width="18" height="10" fill="none" style={{ animation: "hFloat 2.5s ease-in-out 2s infinite" }}>
+            <path d="M2,2 L10,9 L18,2" stroke={C.gold} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.4" />
+          </svg>
+        </div>
 
         {/* Hindi */}
         <p lang="hi" aria-label="Shubh Vivah" style={{
@@ -116,8 +194,8 @@ export default function HeroInvitation({ onViewEvents, onRSVP, onShare, onCalend
             width:"100%", height:"100%",
             borderRadius:"50% 50% 48% 52% / 55% 55% 45% 45%",
             overflow:"hidden",
-            border:`1.5px solid rgba(182,150,89,0.35)`,
-            boxShadow:`0 0 0 4px rgba(244,235,221,0.88), 0 8px 28px rgba(66,58,54,0.13)`,
+            border:`3px solid ${C.charcoal}`,
+            boxShadow:`0 0 0 5px rgba(244,235,221,0.9), 0 0 0 7px rgba(66,58,54,0.12), 0 10px 32px rgba(66,58,54,0.18)`,
             position:"relative",
             background: C.champagne,
           }}>
@@ -276,68 +354,6 @@ export default function HeroInvitation({ onViewEvents, onRSVP, onShare, onCalend
         </div>
 
       </div>
-
-      {/* Swipe-up hint - sits just above the bottom nav area */}
-      <div
-        aria-hidden="true"
-        onClick={() => document.getElementById("countdown")?.scrollIntoView({ behavior: "smooth" })}
-        style={{
-          position: "absolute",
-          bottom: "calc(env(safe-area-inset-bottom,0px) + 72px)",
-          left: "50%",
-          transform: "translateX(-50%)",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: 5,
-          cursor: "pointer",
-          animation: `hFadeIn 0.6s ease 2s both`,
-          opacity: 0,
-        }}
-      >
-        {/* Animated line that slides up repeatedly */}
-        <div style={{
-          width: 1,
-          height: 20,
-          overflow: "hidden",
-          position: "relative",
-        }}>
-          <div style={{
-            width: 1,
-            height: 20,
-            background: `linear-gradient(to top, ${C.gold}, transparent)`,
-            animation: "swipeLineUp 1.8s ease-in-out infinite",
-          }} />
-        </div>
-
-        {/* Small pill with text */}
-        <div style={{
-          padding: "4px 14px",
-          borderRadius: 20,
-          background: "rgba(182,150,89,0.08)",
-          border: "1px solid rgba(182,150,89,0.2)",
-        }}>
-          <span style={{
-            fontFamily: F.body,
-            fontSize: 9,
-            fontWeight: 600,
-            letterSpacing: "0.15em",
-            textTransform: "uppercase" as const,
-            color: C.gold,
-            opacity: 0.7,
-          }}>
-            Scroll to explore
-          </span>
-        </div>
-      </div>
-
-      <style>{`
-        @keyframes swipeLineUp {
-          0%   { transform: translateY(20px); opacity: 0; }
-          40%  { opacity: 0.6; }
-          100% { transform: translateY(-4px); opacity: 0; }
-        }
-      `}</style>
     </section>
   );
 }
