@@ -1,9 +1,6 @@
 // ─── RSVP backend abstraction ─────────────────────────────────────────────────
-// Google Apps Script returns a redirect (302) which causes CORS issues with
-// regular fetch. We use two strategies:
-// 1. Try fetch with redirect: "follow" first
-// 2. If that fails, use mode: "no-cors" which sends the data but returns opaque response
-// The data still reaches the Google Sheet in both cases.
+// Google Apps Script redirects POST requests (302) which causes CORS issues.
+// Solution: submit via a hidden iframe form POST which follows redirects natively.
 
 import type { RSVPData } from "@/types/rsvp";
 
@@ -15,14 +12,13 @@ export async function submitRSVP(data: RSVPData): Promise<{ success: boolean; me
     console.log("Timestamp:", new Date().toISOString());
     console.log("Guest:", data.name, "|", data.mobile);
     console.log("Events:", data.attendance);
-    console.log("Additional info:", data);
+    console.log("Message:", data.message);
     console.groupEnd();
 
     await new Promise((r) => setTimeout(r, 900));
     return { success: true, message: "mock" };
   }
 
-  // ── Live mode ───────────────────────────────────────────────────────────────
   const endpoint = process.env.NEXT_PUBLIC_RSVP_ENDPOINT;
   if (!endpoint) {
     throw new Error("RSVP endpoint not configured");
@@ -34,45 +30,66 @@ export async function submitRSVP(data: RSVPData): Promise<{ success: boolean; me
     source: "wedding-website",
   };
 
-  try {
-    // Strategy 1: Normal fetch with redirect follow
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "text/plain" }, // text/plain avoids CORS preflight
-      body: JSON.stringify(payload),
-      redirect: "follow",
-    });
-
-    // Google Apps Script may return 200 or redirect to a result page
-    // Any non-error status means the data was received
-    if (response.ok || response.type === "opaque" || response.status === 0) {
-      return { success: true, message: "live" };
-    }
-
-    // If we got a readable error, throw it
-    if (!response.ok && response.status >= 400) {
-      const text = await response.text().catch(() => "");
-      throw new Error(`RSVP failed: ${response.status} ${text}`);
-    }
-
-    // Otherwise assume success — Apps Script received the data
-    return { success: true, message: "live" };
-
-  } catch (err: unknown) {
-    // Strategy 2: If CORS blocks the redirect, try no-cors
-    // The data still reaches the server, we just can't read the response
+  // Strategy: Use a hidden form + iframe to POST data.
+  // This avoids CORS entirely because form submissions follow redirects natively.
+  return new Promise((resolve, reject) => {
     try {
-      await fetch(endpoint, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "text/plain" },
-        body: JSON.stringify(payload),
-      });
-      // no-cors always returns opaque response — assume success
-      return { success: true, message: "live-no-cors" };
-    } catch {
-      // Both strategies failed — likely network issue
-      throw new Error("Could not reach the server. Please check your connection and try again.");
+      const iframeName = "rsvp_frame_" + Date.now();
+
+      // Create hidden iframe
+      const iframe = document.createElement("iframe");
+      iframe.name = iframeName;
+      iframe.style.display = "none";
+      document.body.appendChild(iframe);
+
+      // Create hidden form
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = endpoint;
+      form.target = iframeName;
+      form.style.display = "none";
+
+      // Add payload as a hidden input
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = "data";
+      input.value = JSON.stringify(payload);
+      form.appendChild(input);
+
+      document.body.appendChild(form);
+
+      // Listen for iframe load (means form submitted successfully)
+      let resolved = false;
+      iframe.onload = () => {
+        if (!resolved) {
+          resolved = true;
+          // Clean up after a short delay
+          setTimeout(() => {
+            document.body.removeChild(iframe);
+            document.body.removeChild(form);
+          }, 1000);
+          resolve({ success: true, message: "live" });
+        }
+      };
+
+      // Timeout fallback — assume success after 5 seconds
+      setTimeout(() => {
+        if (!resolved) {
+          resolved = true;
+          try {
+            document.body.removeChild(iframe);
+            document.body.removeChild(form);
+          } catch {}
+          // Form was submitted, we just can't confirm — assume success
+          resolve({ success: true, message: "live-timeout" });
+        }
+      }, 5000);
+
+      // Submit the form
+      form.submit();
+
+    } catch (err) {
+      reject(new Error("Could not submit RSVP. Please try again."));
     }
-  }
+  });
 }
