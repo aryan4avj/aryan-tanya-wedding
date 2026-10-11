@@ -84,4 +84,4 @@ Connected to the Google Sheets via Google Apps Script. RSVP submissions are stor
 
 ---
 
-Made with love for Aryan & Tanya | December 2026
+Made with love for Aryan & Tanya | December 2026 | Vaishali, Ghaziabad
