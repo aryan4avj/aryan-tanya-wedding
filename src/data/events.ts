@@ -27,7 +27,7 @@ export interface WeddingEvent {
 export const weddingEvents: WeddingEvent[] = [
   // ── 2 December ────────────────────────────────────────────────────────────
   {
-    id: "haldi-Mehndi",
+    id: "haldi-mehndi",
     name: "Haldi, Mehndi & Bhaat",
     date: "2026-12-02",
     dateDisplay: "Wednesday, 2 December 2026",
@@ -70,7 +70,7 @@ export const weddingEvents: WeddingEvent[] = [
   // ── 4 December ────────────────────────────────────────────────────────────
   {
     id: "nikrosi",
-    name: "Nikrosi & Gurchadi",
+    name: "Nikrosi/Gurchadi",
     date: "2026-12-04",
     dateDisplay: "Friday, 4 December 2026",
     timeStart: "4:00 PM",
@@ -79,7 +79,7 @@ export const weddingEvents: WeddingEvent[] = [
     venue: "The Roseman Hotel & Suites, Vaishali",
     venueId: "roseman",
     description:
-      "The wedding celebrations begin with the sacred Nikrosi and Gurchadi ceremonies at The Roseman Hotel & Suites. From here, the groom's party will make its way to the nearby Jain Temple for the ceremonial journey.",
+      "The wedding celebrations begin with the sacred Nikrosi/Gurchadi ceremonies at The Roseman Hotel & Suites. From here, the groom's party will make its way to the nearby Jain Temple for the ceremonial journey.",
     mapLinks: [
       { label: "Open Location", url: "https://maps.app.goo.gl/4wwHrXVPVw1M4e7T7" },
     ],

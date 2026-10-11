@@ -277,19 +277,67 @@ export default function HeroInvitation({ onViewEvents, onRSVP, onShare, onCalend
 
       </div>
 
-      {/* Scroll down arrow */}
-      <div aria-hidden="true" style={{
-        position: "absolute",
-        bottom: "calc(env(safe-area-inset-bottom,0px) + 74px)",
-        left: "50%",
-        transform: "translateX(-50%)",
-        animation: `hFadeIn 0.6s ease 1.6s both, hFloat 2.4s ease-in-out 2.2s infinite`,
-        opacity: 0,
-      }}>
-        <svg viewBox="0 0 24 14" width="22" height="13" fill="none">
-          <path d="M2,2 L12,11 L22,2" stroke={C.gold} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" opacity="0.45" />
-        </svg>
+      {/* Swipe-up hint - sits just above the bottom nav area */}
+      <div
+        aria-hidden="true"
+        onClick={() => document.getElementById("countdown")?.scrollIntoView({ behavior: "smooth" })}
+        style={{
+          position: "absolute",
+          bottom: "calc(env(safe-area-inset-bottom,0px) + 72px)",
+          left: "50%",
+          transform: "translateX(-50%)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 5,
+          cursor: "pointer",
+          animation: `hFadeIn 0.6s ease 2s both`,
+          opacity: 0,
+        }}
+      >
+        {/* Animated line that slides up repeatedly */}
+        <div style={{
+          width: 1,
+          height: 20,
+          overflow: "hidden",
+          position: "relative",
+        }}>
+          <div style={{
+            width: 1,
+            height: 20,
+            background: `linear-gradient(to top, ${C.gold}, transparent)`,
+            animation: "swipeLineUp 1.8s ease-in-out infinite",
+          }} />
+        </div>
+
+        {/* Small pill with text */}
+        <div style={{
+          padding: "4px 14px",
+          borderRadius: 20,
+          background: "rgba(182,150,89,0.08)",
+          border: "1px solid rgba(182,150,89,0.2)",
+        }}>
+          <span style={{
+            fontFamily: F.body,
+            fontSize: 9,
+            fontWeight: 600,
+            letterSpacing: "0.15em",
+            textTransform: "uppercase" as const,
+            color: C.gold,
+            opacity: 0.7,
+          }}>
+            Scroll to explore
+          </span>
+        </div>
       </div>
+
+      <style>{`
+        @keyframes swipeLineUp {
+          0%   { transform: translateY(20px); opacity: 0; }
+          40%  { opacity: 0.6; }
+          100% { transform: translateY(-4px); opacity: 0; }
+        }
+      `}</style>
     </section>
   );
 }

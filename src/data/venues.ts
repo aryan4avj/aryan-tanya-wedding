@@ -27,7 +27,7 @@ export const venues: Venue[] = [
   {
     id: "mahagun-mansion",
     name: "Mahagun Mansion Phase 1 Clubhouse",
-    events: ["haldi-Mehndi"],
+    events: ["haldi-mehndi"],
     address: "Mahagun Mansion Phase 1, Sector 3, Vaishali, Ghaziabad",
     mapUrl: "https://maps.app.goo.gl/dxj2FxjCyE7hb6hA8",
     travelNote: "Inside Mahagun Mansion residential complex, Sector 3.",
