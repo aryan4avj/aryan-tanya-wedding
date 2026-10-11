@@ -80,7 +80,7 @@ git push origin main
 
 ## RSVP Backend
 
-Connected to Google Sheets via Google Apps Script. RSVP submissions are stored in a Google Sheet with columns: Timestamp, Name, Mobile, Email, Guests, Event Attendance, Message.
+Connected to the Google Sheets via Google Apps Script. RSVP submissions are stored in a Google Sheet with columns: Timestamp, Name, Mobile, Email, Guests, Event Attendance, Message.
 
 ---
 
