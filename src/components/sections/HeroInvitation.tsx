@@ -194,8 +194,8 @@ export default function HeroInvitation({ onViewEvents, onRSVP, onShare, onCalend
             width:"100%", height:"100%",
             borderRadius:"50% 50% 48% 52% / 55% 55% 45% 45%",
             overflow:"hidden",
-            border:`3px solid ${C.charcoal}`,
-            boxShadow:`0 0 0 5px rgba(244,235,221,0.9), 0 0 0 7px rgba(66,58,54,0.12), 0 10px 32px rgba(66,58,54,0.18)`,
+            border:`3px solid ${C.gold}`,
+            boxShadow:`0 0 0 5px rgba(244,235,221,0.9), 0 0 12px rgba(182,150,89,0.25), 0 0 0 8px rgba(182,150,89,0.1), 0 10px 32px rgba(66,58,54,0.15)`,
             position:"relative",
             background: C.champagne,
           }}>

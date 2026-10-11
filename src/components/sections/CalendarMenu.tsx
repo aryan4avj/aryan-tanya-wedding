@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { downloadICS } from "@/lib/calendar";
+import { buildGoogleCalendarUrl } from "@/lib/calendar";
 import type { WeddingEvent } from "@/data/events";
 
 interface CalendarMenuProps {
@@ -9,26 +9,27 @@ interface CalendarMenuProps {
 }
 
 /**
- * On mobile phones:
- * - ICS file download automatically opens the native Calendar app (both iOS and Android)
- * - iOS Safari: opens Apple Calendar "Add Event" screen
- * - Android Chrome: opens Google Calendar or default calendar app
+ * Directly opens Google Calendar add-event URL.
+ * Works on all phones and browsers:
+ * - Android: opens Google Calendar app if installed, otherwise web
+ * - iOS: opens Google Calendar in browser (Safari) where user can add to any calendar
+ * - Desktop: opens Google Calendar web
  * 
- * No need for a menu — just trigger the download directly.
+ * Google Calendar URL is the most universal approach — no file downloads,
+ * no CORS issues, works across all platforms.
  */
 export default function CalendarMenu({ event, onClose }: CalendarMenuProps) {
-  // Immediately download the ICS file and close
   const mapUrl = event.mapLinks[0]?.url;
   const hasMap = mapUrl && !mapUrl.startsWith("PLACEHOLDER");
-  
-  // Use setTimeout to ensure the component renders before triggering download
+  const googleUrl = buildGoogleCalendarUrl(event, hasMap ? mapUrl : undefined);
+
+  // Open Google Calendar directly and close
   if (typeof window !== "undefined") {
     setTimeout(() => {
-      downloadICS(event, hasMap ? mapUrl : undefined);
+      window.open(googleUrl, "_blank");
       onClose();
-    }, 100);
+    }, 50);
   }
 
-  // Return nothing visible — the download happens automatically
   return null;
 }

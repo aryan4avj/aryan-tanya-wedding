@@ -181,7 +181,7 @@ export default function InvitationOpening({ onOpen }: { onOpen: () => void }) {
               fontFamily: F.body,
               fontSize: 13,
               color: C.dustyRose,
-              marginBottom: 10,
+              marginBottom: skipAttempt < 3 ? 8 : 0,
               lineHeight: 1.5,
               padding: "8px 16px",
               background: "rgba(213,154,145,0.08)",
@@ -190,35 +190,12 @@ export default function InvitationOpening({ onOpen }: { onOpen: () => void }) {
             }}>
               {skipMessages[Math.min(skipAttempt - 1, skipMessages.length - 1)]}
             </p>
-            {skipAttempt < 3 ? (
+            {skipAttempt < 3 && (
               <button
                 onClick={handleSkip}
                 style={{ background: "none", border: "none", cursor: "pointer", fontFamily: F.body, fontSize: "0.68rem", color: C.muted, letterSpacing: "0.06em", padding: "6px 12px" }}
               >
                 Skip anyway
-              </button>
-            ) : (
-              <button
-                onClick={handleOpen}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  minHeight: 44,
-                  padding: "0 2rem",
-                  background: C.charcoal,
-                  color: C.ivory,
-                  fontFamily: F.body,
-                  fontSize: "0.75rem",
-                  fontWeight: 600,
-                  letterSpacing: "0.12em",
-                  textTransform: "uppercase" as const,
-                  borderRadius: 9999,
-                  border: "none",
-                  cursor: "pointer",
-                }}
-              >
-                Open Invitation
               </button>
             )}
           </div>
