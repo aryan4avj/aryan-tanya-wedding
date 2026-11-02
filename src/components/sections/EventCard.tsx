@@ -150,7 +150,7 @@ export default function EventCard({ event }: { event: WeddingEvent }) {
         </article>
       </div>
 
-      {calOpen && <CalendarMenu event={event} onClose={() => setCalOpen(false)} />}
+      {calOpen && <CalendarMenu events={[event]} onClose={() => setCalOpen(false)} />}
     </>
   );
 }

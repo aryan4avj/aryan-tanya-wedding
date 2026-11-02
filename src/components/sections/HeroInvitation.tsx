@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { C, F, styles } from "@/lib/styles";
 import ImageWithFallback from "@/components/ui/ImageWithFallback";
+import ScrollCue from "@/components/ui/ScrollCue";
 import { coupleAssets } from "@/data/wedding";
 
 interface HeroProps {
@@ -19,8 +20,42 @@ const KEYFRAMES = `
   @keyframes hSlideR   { from { opacity:0; transform:translateX(18px); }  to { opacity:1; transform:translateX(0); } }
   @keyframes hPop      { 0%{opacity:0;transform:scale(0.5);} 70%{transform:scale(1.12);} 100%{opacity:1;transform:scale(1);} }
   @keyframes hThread   { from{stroke-dashoffset:200;opacity:0;} 10%{opacity:1;} to{stroke-dashoffset:0;opacity:0.45;} }
-  @keyframes hFloat    { 0%,100%{transform:translateX(-50%) translateY(0);} 50%{transform:translateX(-50%) translateY(-5px);} }
-  @keyframes hDotScroll{ 0%{cy:8;opacity:0.7;} 100%{cy:22;opacity:0;} }
+`;
+
+// Hero layout: keep the content and the scroll cue above the fixed mobile bottom nav (59px) on
+// phones, and below the fixed desktop nav (64px) on md+. --hero-reserve is the vertical space
+// everything except the portrait needs, so the portrait shrinks a little on short screens
+// instead of pushing the RSVP button behind the nav. svh = height with browser toolbars showing,
+// which keeps the size stable while toolbars collapse during scroll.
+const LAYOUT_CSS = `
+  .hero-home {
+    min-height: 100vh;
+    min-height: 100svh;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: calc(67px + env(safe-area-inset-bottom, 0px)); /* 59px nav + 8px gap */
+    --hero-reserve: 470px;
+  }
+  @media (min-height: 720px) { .hero-home { --hero-reserve: 505px; } }
+  @media (max-height: 600px) { .hero-home { --hero-reserve: 368px; } }
+  @media (min-width: 768px) {
+    .hero-home {
+      padding-top: calc(64px + env(safe-area-inset-top, 0px));
+      padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+      --hero-reserve: 528px;
+    }
+  }
+  @media (min-width: 768px) and (min-height: 720px) { .hero-home { --hero-reserve: 552px; } }
+  @media (min-width: 768px) and (max-height: 640px) { .hero-home { --hero-reserve: 442px; } }
+
+  /* First line is the fallback for browsers without svh support */
+  .hero-portrait { width: clamp(140px, 40vw, 185px); }
+  .hero-portrait { width: clamp(112px, min(40vw, calc((100svh - var(--hero-reserve)) * 0.75)), 185px); }
+
+  /* Short screens (e.g. iPhone SE): CTAs side by side so both stay visible with the cue */
+  @media (max-height: 600px), (min-width: 768px) and (max-height: 640px) {
+    .hero-ctas { flex-direction: row !important; gap: 8px !important; max-width: 330px !important; }
+    .hero-ctas > button { flex: 1 1 auto; min-height: 42px !important; padding: 0 16px !important; }
+  }
 `;
 
 export default function HeroInvitation({ onViewEvents, onRSVP, onShare, onCalendar }: HeroProps) {
@@ -40,9 +75,9 @@ export default function HeroInvitation({ onViewEvents, onRSVP, onShare, onCalend
     <section
       id="home"
       aria-labelledby="hero-names"
+      className="hero-home"
       style={{
         position: "relative",
-        height: "100dvh",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -53,10 +88,10 @@ export default function HeroInvitation({ onViewEvents, onRSVP, onShare, onCalend
           radial-gradient(ellipse at 5%  95%, rgba(243,222,217,0.45) 0%, transparent 45%)
         `,
         overflow: "hidden",
-        paddingTop:    "env(safe-area-inset-top, 0px)",
-        paddingBottom: "env(safe-area-inset-bottom, 0px)",
       }}
     >
+      <style>{LAYOUT_CSS}</style>
+
       {/* Party popper confetti falling from top */}
       <style>{`
         @keyframes heroConfettiFall {
@@ -140,7 +175,7 @@ export default function HeroInvitation({ onViewEvents, onRSVP, onShare, onCalend
         <ellipse cx="68" cy="40" rx="6" ry="3.5" fill={C.marigold} opacity="0.7" transform="rotate(-25,68,40)" />
       </svg>
 
-      {/* ── Content stack ──────────────────────────────────────── */}
+      {/* ── Content stack (auto margins centre it in the space above the scroll cue) ── */}
       <div style={{
         position: "relative",
         zIndex: 10,
@@ -150,35 +185,26 @@ export default function HeroInvitation({ onViewEvents, onRSVP, onShare, onCalend
         textAlign: "center",
         width: "100%",
         maxWidth: 420,
-        padding: "0 clamp(1rem, 5vw, 2rem)",
+        margin: "auto 0",
+        padding: "clamp(8px, 2vh, 16px) clamp(1rem, 5vw, 2rem) 6px",
         gap: 0,
       }}>
-
-        {/* Subtle down arrow above Hindi text */}
-        <div aria-hidden="true" style={{
-          marginBottom: "clamp(4px, 1vh, 8px)",
-          animation: a("hFadeIn", 0, 0.4),
-        }}>
-          <svg viewBox="0 0 20 12" width="18" height="10" fill="none" style={{ animation: "hFloat 2.5s ease-in-out 2s infinite" }}>
-            <path d="M2,2 L10,9 L18,2" stroke={C.gold} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.4" />
-          </svg>
-        </div>
 
         {/* Hindi */}
         <p lang="hi" aria-label="Shubh Vivah" style={{
           fontFamily: F.hindi,
           fontSize: "clamp(0.95rem, 3vw, 1.1rem)",
           color: C.gold, opacity: 0.9, letterSpacing: "0.04em",
+          marginTop: 0, // first item - the browser's default 1em top margin is dead space here
           marginBottom: "clamp(5px, 1.2vh, 10px)",
           animation: a("hFadeIn", 0.05, 0.5),
         }}>
           शुभ विवाह
         </p>
 
-        {/* Portrait - deliberately compact */}
-        <div style={{
+        {/* Portrait - deliberately compact; width comes from .hero-portrait (height-aware) */}
+        <div className="hero-portrait" style={{
           position: "relative",
-          width: "clamp(140px, 40vw, 185px)",
           aspectRatio: "3/4",
           marginBottom: "clamp(6px, 1.5vh, 12px)",
           flexShrink: 0,
@@ -338,7 +364,7 @@ export default function HeroInvitation({ onViewEvents, onRSVP, onShare, onCalend
         </p>
 
         {/* Primary CTAs - only two buttons, no calendar/share clutter */}
-        <div style={{
+        <div className="hero-ctas" style={{
           display:"flex", flexDirection:"column", gap:9,
           width:"100%", maxWidth:290,
           animation: a("hFadeUp", 0.67, 0.55),
@@ -354,6 +380,9 @@ export default function HeroInvitation({ onViewEvents, onRSVP, onShare, onCalend
         </div>
 
       </div>
+
+      {/* Tells guests there's more below (and nudges the page if they don't scroll) */}
+      <ScrollCue />
     </section>
   );
 }

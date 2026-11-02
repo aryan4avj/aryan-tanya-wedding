@@ -4,8 +4,8 @@ import { useState } from "react";
 import { CalendarPlus } from "lucide-react";
 import SectionHeading from "@/components/ui/SectionHeading";
 import EventCard from "@/components/sections/EventCard";
+import CalendarMenu from "@/components/sections/CalendarMenu";
 import { weddingEvents, eventsByDate } from "@/data/events";
-import { downloadAllICS } from "@/lib/calendar";
 import { C, F, styles } from "@/lib/styles";
 
 type DateFilter = "all" | "2026-12-02" | "2026-12-03" | "2026-12-04";
@@ -25,6 +25,7 @@ const DATE_LABELS: Record<string, string> = {
 
 export default function EventTimeline() {
   const [active, setActive] = useState<DateFilter>("all");
+  const [calOpen, setCalOpen] = useState(false);
   const events = eventsByDate[active] ?? weddingEvents;
 
   const byDate: Record<string, typeof events> = {};
@@ -103,7 +104,7 @@ export default function EventTimeline() {
         {/* Add all */}
         <div style={{ textAlign: "center", marginTop: 20 }}>
           <button
-            onClick={() => downloadAllICS(weddingEvents)}
+            onClick={() => setCalOpen(true)}
             style={{
               ...styles.btnOutline,
               gap: 6,
@@ -118,6 +119,8 @@ export default function EventTimeline() {
           </button>
         </div>
       </div>
+
+      {calOpen && <CalendarMenu events={weddingEvents} onClose={() => setCalOpen(false)} />}
     </section>
   );
 }

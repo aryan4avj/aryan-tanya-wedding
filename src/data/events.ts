@@ -31,9 +31,9 @@ export const weddingEvents: WeddingEvent[] = [
     name: "Haldi, Mehndi & Bhaat",
     date: "2026-12-02",
     dateDisplay: "Wednesday, 2 December 2026",
-    timeStart: "12:00 PM",
-    timeEnd: "5:00 PM",
-    timeDisplay: "12:00 PM – 5:00 PM",
+    timeStart: "1:00 PM",
+    timeEnd: "7:00 PM",
+    timeDisplay: "1:00 PM – 7:00 PM",
     venue: "Mahagun Mansion Phase 1 Clubhouse, Vaishali",
     venueId: "mahagun-mansion",
     description:
@@ -41,7 +41,7 @@ export const weddingEvents: WeddingEvent[] = [
     mapLinks: [
       { label: "Open Location", url: "https://maps.app.goo.gl/dxj2FxjCyE7hb6hA8" },
     ],
-    calendarDuration: 300,
+    calendarDuration: 360,
     iconName: "flower",
     accentColor: "#E5AA46",
   },

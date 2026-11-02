@@ -18,10 +18,16 @@ function Lightbox({ images, index: initialIdx, year, onClose }: {
   onClose: () => void;
 }) {
   const [idx, setIdx] = useState(initialIdx);
+  const total = images.length;
   const current = images[idx];
-  const goNext = () => setIdx(i => Math.min(i + 1, images.length - 1));
-  const goPrev = () => setIdx(i => Math.max(i - 1, 0));
+  // Loops in both directions (last -> first, first -> last), same as the circle collage
+  const goNext = () => setIdx(i => (i + 1) % total);
+  const goPrev = () => setIdx(i => (i - 1 + total) % total);
   const swipe = useSwipe({ onSwipeLeft: goNext, onSwipeRight: goPrev });
+  // Neighbours are preloaded so stepping round the loop feels instant
+  const neighbours = total > 1
+    ? [...new Set([(idx + 1) % total, (idx - 1 + total) % total])].filter(i => i !== idx)
+    : [];
 
   useEffect(() => {
     // Lock scroll + hide bottom nav
@@ -31,8 +37,8 @@ function Lightbox({ images, index: initialIdx, year, onClose }: {
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape")     onClose();
-      if (e.key === "ArrowRight") goNext();
-      if (e.key === "ArrowLeft")  goPrev();
+      if (e.key === "ArrowRight") setIdx(i => (i + 1) % total);
+      if (e.key === "ArrowLeft")  setIdx(i => (i - 1 + total) % total);
     };
     document.addEventListener("keydown", onKey);
     return () => {
@@ -40,7 +46,7 @@ function Lightbox({ images, index: initialIdx, year, onClose }: {
       document.body.removeAttribute("data-gallery-open");
       document.removeEventListener("keydown", onKey);
     };
-  }, [images.length, onClose]);
+  }, [total, onClose]);
 
   if (!current) return null;
 
@@ -67,15 +73,26 @@ function Lightbox({ images, index: initialIdx, year, onClose }: {
           overflow: "hidden",
           background: C.champagne,
         }}>
+          <style>{`@keyframes lbFade { from { opacity: 0; } to { opacity: 1; } }`}</style>
           <Image
+            key={current.src}
             src={current.src}
             alt={current.alt}
             fill
-            style={{ objectFit: "contain", objectPosition: "center" }}
+            style={{ objectFit: "contain", objectPosition: "center", animation: "lbFade 0.3s ease" }}
             sizes="(max-width: 600px) 95vw, 500px"
             priority
           />
         </div>
+
+        {/* Off-screen copies of the previous/next photos so they're already loaded */}
+        {neighbours.length > 0 && (
+          <div aria-hidden="true" style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", opacity: 0, pointerEvents: "none" }}>
+            {neighbours.map(i => (
+              <Image key={images[i].src} src={images[i].src} alt="" fill sizes="(max-width: 600px) 95vw, 500px" loading="eager" />
+            ))}
+          </div>
+        )}
 
         {/* Caption */}
         <div style={{ textAlign: "center" }}>
@@ -84,21 +101,18 @@ function Lightbox({ images, index: initialIdx, year, onClose }: {
         </div>
 
         {/* Dot nav */}
-        {images.length > 1 && (
+        {total > 1 && (
           <>
-            {idx > 0 && (
-              <button onClick={() => setIdx(i => i - 1)} aria-label="Previous" style={{ position: "absolute", left: -4, top: "40%", transform: "translateY(-50%)", width: 38, height: 38, borderRadius: "50%", background: "rgba(255,255,255,0.12)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <ChevronLeft size={18} color="#fff" />
-              </button>
-            )}
-            {idx < images.length - 1 && (
-              <button onClick={() => setIdx(i => i + 1)} aria-label="Next" style={{ position: "absolute", right: -4, top: "40%", transform: "translateY(-50%)", width: 38, height: 38, borderRadius: "50%", background: "rgba(255,255,255,0.12)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <ChevronRight size={18} color="#fff" />
-              </button>
-            )}
+            {/* Always shown - the gallery wraps around at both ends */}
+            <button onClick={goPrev} aria-label="Previous photo" style={{ position: "absolute", left: -4, top: "40%", transform: "translateY(-50%)", width: 44, height: 44, borderRadius: "50%", background: "rgba(255,255,255,0.14)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <ChevronLeft size={20} color="#fff" />
+            </button>
+            <button onClick={goNext} aria-label="Next photo" style={{ position: "absolute", right: -4, top: "40%", transform: "translateY(-50%)", width: 44, height: 44, borderRadius: "50%", background: "rgba(255,255,255,0.14)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <ChevronRight size={20} color="#fff" />
+            </button>
             <div style={{ display: "flex", gap: 6 }}>
               {images.map((_, i) => (
-                <button key={i} onClick={() => setIdx(i)} style={{ width: i === idx ? 20 : 7, height: 7, borderRadius: 4, background: i === idx ? C.gold : "rgba(255,255,255,0.3)", border: "none", cursor: "pointer", padding: 0, transition: "all 0.25s" }} />
+                <button key={i} onClick={() => setIdx(i)} aria-label={`Photo ${i + 1} of ${total}`} aria-current={i === idx ? "true" : undefined} style={{ width: i === idx ? 20 : 7, height: 7, borderRadius: 4, background: i === idx ? C.gold : "rgba(255,255,255,0.3)", border: "none", cursor: "pointer", padding: 0, transition: "all 0.25s" }} />
               ))}
             </div>
           </>

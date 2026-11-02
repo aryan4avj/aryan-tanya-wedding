@@ -13,7 +13,7 @@ export const siteConfig = {
     start: "2026-12-02",
     end:   "2026-12-04",
     display: "2–4 December 2026",
-    countdownTarget: "2026-12-02T12:00:00+05:30", // Haldi start
+    countdownTarget: "2026-12-02T13:00:00+05:30", // Haldi start (1:00 PM IST)
     timezone: "Asia/Kolkata",
   },
 

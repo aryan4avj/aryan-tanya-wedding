@@ -7,15 +7,16 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { coupleAssets } from "@/data/wedding";
 import { venues } from "@/data/venues";
 import { weddingEvents } from "@/data/events";
-import { downloadAllICS } from "@/lib/calendar";
 import { C, F, styles } from "@/lib/styles";
 import ShareInvitation from "@/components/sections/ShareInvitation";
+import CalendarMenu from "@/components/sections/CalendarMenu";
 
 export default function FinalSection() {
   const ref1 = useScrollReveal<HTMLDivElement>();
   const ref2 = useScrollReveal<HTMLDivElement>();
   const ref3 = useScrollReveal<HTMLDivElement>();
   const [shareOpen, setShareOpen] = useState(false);
+  const [calOpen, setCalOpen] = useState(false);
 
   const weddingVenue = venues.find(v => v.id === "hollywood-dreams");
   const hasMap = weddingVenue?.mapUrl && !weddingVenue.mapUrl.startsWith("PLACEHOLDER");
@@ -200,7 +201,7 @@ export default function FinalSection() {
               <Share2 size={14} /> Share Invitation
             </button>
             <button
-              onClick={() => downloadAllICS(weddingEvents)}
+              onClick={() => setCalOpen(true)}
               style={{ background: "none", border: "none", cursor: "pointer", fontFamily: F.body, fontSize: "0.78rem", color: C.secondary, textDecoration: "underline", padding: "8px 0" }}
             >
               Add all celebrations to calendar
@@ -226,6 +227,7 @@ export default function FinalSection() {
       </footer>
 
       {shareOpen && <ShareInvitation variant="modal" onClose={() => setShareOpen(false)} />}
+      {calOpen && <CalendarMenu events={weddingEvents} onClose={() => setCalOpen(false)} />}
     </>
   );
 }

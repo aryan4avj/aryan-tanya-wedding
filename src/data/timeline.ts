@@ -83,7 +83,7 @@ export const timelineMilestones: TimelineMilestone[] = [
         frameStyle: "postcard",
       },
       {
-        src: "/assets/story/long-distance-02.png",
+        src: "/assets/story/long-distance-02-v2.png",
         alt: "Calls that made the distance feel smaller",
         focalPosition: "center center",
         orientation: "portrait",
@@ -97,7 +97,7 @@ export const timelineMilestones: TimelineMilestone[] = [
         frameStyle: "postcard",
       },
       {
-        src: "/assets/story/long-distance-04.png",
+        src: "/assets/story/long-distance-04-v2.png",
         alt: "Every call brought us closer",
         focalPosition: "center center",
         orientation: "portrait",
@@ -136,7 +136,7 @@ export const timelineMilestones: TimelineMilestone[] = [
         frameStyle: "torn",
       },
       {
-        src: "/assets/story/memories-04.png",
+        src: "/assets/story/memories-04-v2.png",
         alt: "Favourite moments together",
         focalPosition: "center center",
         orientation: "portrait",
@@ -152,6 +152,13 @@ export const timelineMilestones: TimelineMilestone[] = [
       {
         src: "/assets/story/memories-06.png",
         alt: "Every moment made us closer",
+        focalPosition: "center center",
+        orientation: "portrait",
+        frameStyle: "postcard",
+      },
+      {
+        src: "/assets/story/memories-07.png",
+        alt: "Hand in hand along the cliffs by the sea",
         focalPosition: "center center",
         orientation: "portrait",
         frameStyle: "postcard",
