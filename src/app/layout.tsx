@@ -7,19 +7,20 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.social.url),
   title: siteConfig.social.title,
   description: siteConfig.social.description,
+  alternates: { canonical: siteConfig.social.url },
   robots: { index: false, follow: false },
   openGraph: {
     type: "website",
     url: siteConfig.social.url,
     title: siteConfig.social.title,
     description: siteConfig.social.description,
-    images: [{ url: siteConfig.social.ogImage, width: 1200, height: 630 }],
+    images: [{ url: siteConfig.social.ogImage, alt: "Aryan and Tanya wedding invitation cover" }],
   },
   twitter: {
     card: "summary_large_image",
     title: siteConfig.social.title,
     description: siteConfig.social.description,
-    images: [siteConfig.social.ogImage],
+    images: [{ url: siteConfig.social.ogImage, alt: "Aryan and Tanya wedding invitation cover" }],
   },
 };
 
