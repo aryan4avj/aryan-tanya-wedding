@@ -199,7 +199,7 @@ export default function HeroInvitation({ onViewEvents, onRSVP, onShare, onCalend
           marginBottom: "clamp(5px, 1.2vh, 10px)",
           animation: a("hFadeIn", 0.05, 0.5),
         }}>
-          शुभ विवाह
+          ॥ शुभ विवाह ॥
         </p>
 
         {/* Portrait - deliberately compact; width comes from .hero-portrait (height-aware) */}
