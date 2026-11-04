@@ -29,7 +29,7 @@ export const siteConfig = {
     url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://aryan-tanya-wedding.vercel.app",
     title: "Aryan & Tanya | Wedding Invitation",
     description: "Join us for our wedding celebrations from 2–4 December 2026 in Vaishali.",
-    ogImage: "/assets/couple/hero-couple-v3.png",
+    ogImage: "https://aryan-tanya-wedding.vercel.app/assets/couple/hero-couple-v3.png?v=2",
     whatsappText: "With great joy, Aryan and Tanya invite you to celebrate their wedding from 2–4 December 2026 in Vaishali. Open the invitation for event details and RSVP: ",
   },
 
